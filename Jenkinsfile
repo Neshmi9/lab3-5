@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_CREDENTIALS_ID = 'roseaw-dockerhub'
-        DOCKER_IMAGE = 'neshmi9/lab3-5'
+        DOCKER_IMAGE = 'cithit/alhayen'
         IMAGE_TAG = "build-${BUILD_NUMBER}"
         GITHUB_URL = 'https://github.com/Neshmi9/lab3-5.git'
     }
