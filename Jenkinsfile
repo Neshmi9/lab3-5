@@ -3,10 +3,9 @@ pipeline {
 
     environment {
         DOCKER_CREDENTIALS_ID = 'roseaw-dockerhub'
-        DOCKER_IMAGE = 'neshmi9/lab3-5'                                                                    
+        DOCKER_IMAGE = 'neshmi9/lab3-5'
         IMAGE_TAG = "build-${BUILD_NUMBER}"
-        GITHUB_URL = 'https://github.com/Neshmi9/225-lab3-5.git'                                          
-        KUBECONFIG = credentials('taylorw8-test-credentials')                                                        
+        GITHUB_URL = 'https://github.com/Neshmi9/lab3-5.git'
     }
 
     stages {
@@ -44,29 +43,19 @@ pipeline {
 
         stage('Deploy to Dev Environment') {
             steps {
-                script {
-                    def kubeConfig = readFile(KUBECONFIG)
-                    sh "sed -i 's|${DOCKER_IMAGE}:latest|${DOCKER_IMAGE}:${IMAGE_TAG}|' deployment-dev.yaml"
-                    sh "kubectl apply -f deployment-dev.yaml"
-                }
+                echo 'Skipping Dev Deployment (Kubernetes config removed)'
             }
         }
 
         stage('Deploy to Prod Environment') {
             steps {
-                script {
-                    sh "sed -i 's|${DOCKER_IMAGE}:latest|${DOCKER_IMAGE}:${IMAGE_TAG}|' deployment-prod.yaml"
-                    sh "cd .."
-                    sh "kubectl apply -f deployment-prod.yaml"
-                }
+                echo 'Skipping Prod Deployment (Kubernetes config removed)'
             }
         }
 
         stage('Check Kubernetes Cluster') {
             steps {
-                script {
-                    sh "kubectl get all"
-                }
+                echo 'Skipping Kubernetes check'
             }
         }
     }
