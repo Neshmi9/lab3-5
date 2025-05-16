@@ -1,17 +1,18 @@
 pipeline {
-    agent any 
+    agent any
 
     environment {
-        DOCKER_CREDENTIALS_ID = 'roseaw-dockerhub'
-        DOCKER_IMAGE = 'cithit/alhayen'
-        IMAGE_TAG = "build-${BUILD_NUMBER}"
         GITHUB_URL = 'https://github.com/Neshmi9/lab3-5.git'
+        DOCKER_IMAGE_DEV = 'cithit/alhayen-dev'
+        DOCKER_IMAGE_PROD = 'cithit/alhayen-prod'
+        IMAGE_TAG = "build-${BUILD_NUMBER}"
     }
 
     stages {
         stage('Checkout') {
             steps {
-                checkout([$class: 'GitSCM', branches: [[name: '*/main']],
+                checkout([$class: 'GitSCM',
+                          branches: [[name: '*/main']],
                           userRemoteConfigs: [[url: "${GITHUB_URL}"]]])
             }
         }
@@ -23,40 +24,41 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build Dev Docker Image') {
             steps {
                 script {
-                    docker.build("${DOCKER_IMAGE}:${IMAGE_TAG}", "-f Dockerfile.build .")
+                    docker.build("${DOCKER_IMAGE_DEV}:${IMAGE_TAG}", "-f Dockerfile.dev .")
                 }
             }
         }
 
-        stage('Push Docker Image') {
+        stage('Build Prod Docker Image') {
             steps {
                 script {
-                    docker.withRegistry('https://index.docker.io/v1/', "${DOCKER_CREDENTIALS_ID}") {
-                        docker.image("${DOCKER_IMAGE}:${IMAGE_TAG}").push()
-                    }
+                    docker.build("${DOCKER_IMAGE_PROD}:${IMAGE_TAG}", "-f Dockerfile.prod .")
                 }
             }
         }
 
-        stage('Deploy to Dev Environment') {
+        stage('Push Docker Images') {
             steps {
-                echo 'Skipping Dev Deployment (Kubernetes config removed)'
+                echo 'Skipping Docker image push for this lab'
             }
         }
 
-        stage('Deploy to Prod Environment') {
+        stage('Serve Webpage') {
             steps {
-                echo 'Skipping Prod Deployment (Kubernetes config removed)'
+                echo 'Use Docker run to view the resulting page in the browser'
             }
         }
+    }
 
-        stage('Check Kubernetes Cluster') {
-            steps {
-                echo 'Skipping Kubernetes check'
-            }
+    post {
+        success {
+            echo "Build completed successfully"
+        }
+        failure {
+            echo "Build failed"
         }
     }
 }
